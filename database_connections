@@ -1,0 +1,25 @@
+def database_temps(list):
+    try:
+        query = 'insert into dashboard_temperature(channel, mins, date_min) VALUES(%s,%s,%s)'
+        conn = psycopg2.connect(
+            host="digitalhub-1.c7gscdaeyvjj.eu-west-2.rds.amazonaws.com",
+            port="5432",
+            database="temps DS100+",
+            user="corkgres",
+            password="Corksupply2022db")
+
+        cur = conn.cursor()
+
+        cur.executemany(query, list)
+
+        conn.commit()
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+            print('Database connection closed.')
+
+        return
