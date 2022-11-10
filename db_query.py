@@ -4,7 +4,7 @@ import pandas.io.sql as sqlio
 import streamlit as st
 
 
-@st.cache(allow_output_mutation=True)
+@st.experimental_singleton
 def load_data():
     query = 'select channel, mins, date_min, time_min from dashboard_temperature order by date_min'
     conn = psycopg2.connect(

@@ -19,6 +19,10 @@ with tab1:
     dataframe['date'] = pd.to_datetime(dataframe['date_min'])
 
     # dataframe = dataframe.rename(columns={'date_min':'index'}).set_index('index')
+    if st.button("Refresh"):
+
+        st.experimental_singleton.clear()
+        st.experimental_rerun()
 
     row1_col1, row1_col2 = st.columns(2)
     with row1_col2:
