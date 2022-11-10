@@ -50,7 +50,7 @@ with tab1:
     row2_col1_t, row2_col2_t = st.columns(2)
     with row2_col1_t:
         st.subheader('Min temperatures')
-        fig = px.line(df_plot, x='dates', y='mins')
+        fig = px.scatter(df_plot, x='dates', y='mins')
         st.plotly_chart(fig, use_container_width=True)
     with row2_col2_t:
         st.subheader('Temperatures Boxplot')
@@ -86,7 +86,7 @@ with tab2:
         df_plot_h = df_plot_h.loc[mask]
     row2_col1, row2_col2 = st.columns(2)
     with row2_col1:
-        fig = px.line(df_plot_h, x=df_plot_h.index, y="humidity")
+        fig = px.scatter(df_plot_h, x=df_plot_h.index, y="humidity")
         st.plotly_chart(fig, use_container_width=True)
     with row2_col2:
         fig = px.box(df_plot_h, y="humidity", x='date')
