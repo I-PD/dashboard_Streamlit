@@ -4,10 +4,29 @@ import pandas as pd
 from db_query import load_data, load_data_humidity
 import plotly.figure_factory as ff
 import plotly.express as px
-
+from io import StringIO
+from import_temps import import_temperatures
 st.set_page_config(layout="wide")
 
 st.title('Dashboard DS100+')
+
+with st.sidebar:
+    uploaded_file = st.file_uploader("Choose a file")
+    if uploaded_file is not None:
+        # To read file as bytes:
+        bytes_data = uploaded_file.getvalue()
+        #st.write(bytes_data)
+        output = bytes_data.decode()
+        #print(output)
+        print(uploaded_file.name)
+        import_temperatures(output, uploaded_file.name)
+        # To convert to a string based IO:
+    # stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
+    # st.write(stringio)
+
+    # To read file as string:
+    # string_data = stringio.read()
+    # st.write(string_data)
 
 tab1, tab2 = st.tabs(["Temperatures", "Humidity"])
 
@@ -20,7 +39,6 @@ with tab1:
 
     # dataframe = dataframe.rename(columns={'date_min':'index'}).set_index('index')
     if st.button("Refresh"):
-
         st.experimental_singleton.clear()
         st.experimental_rerun()
 

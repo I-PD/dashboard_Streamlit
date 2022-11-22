@@ -19,7 +19,7 @@ def load_data():
     return dat
 
 
-@st.cache(allow_output_mutation=True)
+@st.experimental_singleton
 def load_data_humidity():
     query = 'select machine,scan_date, value from humidity '
     conn = psycopg2.connect(
