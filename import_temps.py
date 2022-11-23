@@ -198,10 +198,11 @@ def import_temperatures(file, filename):
     for i in range(len(min_4)):
         db_channel_4.append([channels_parsed[3], min_4[i], s, times4[i]])
 
-    print(db_channel_1)
-    database_temps(db_channel_1)
-    database_temps(db_channel_2)
-    database_temps(db_channel_3)
-    database_temps(db_channel_4)
-
-
+    if channels_parsed[0] not in off_channels:
+        database_temps(db_channel_1)
+    if channels_parsed[1] not in off_channels:
+        database_temps(db_channel_2)
+    if channels_parsed[2] in off_channels:
+        database_temps(db_channel_3)
+    if channels_parsed[3] in off_channels:
+        database_temps(db_channel_4)
