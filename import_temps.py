@@ -202,7 +202,7 @@ def import_temperatures(file, filename):
         database_temps(db_channel_1)
     if channels_parsed[1] not in off_channels:
         database_temps(db_channel_2)
-    if channels_parsed[2] in off_channels:
+    if channels_parsed[2] not in off_channels:
         database_temps(db_channel_3)
-    if channels_parsed[3] in off_channels:
+    if channels_parsed[3] not in off_channels:
         database_temps(db_channel_4)
