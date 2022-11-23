@@ -20,6 +20,7 @@ with st.sidebar:
         #print(output)
         print(uploaded_file.name)
         import_temperatures(output, uploaded_file.name)
+        st.write('Import Successful')
         # To convert to a string based IO:
     # stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
     # st.write(stringio)
