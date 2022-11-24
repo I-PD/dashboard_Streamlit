@@ -1,5 +1,8 @@
 import psycopg2
 import time
+from scipy.signal import find_peaks
+import numpy
+import datetime
 
 
 def chunks(lst, n):
@@ -56,6 +59,21 @@ def openCSV(data):
     return channel_1, channel_2, channel_3, channel_4, date_rows, time_rows
 
 
+def find_mins_in_graph(channel_list, channel, time_list):
+    min_list_output = []
+    min_time_list = []
+    ch_array = numpy.array(channel_list)
+    min_list = find_peaks(-ch_array)
+
+    for i in range(len(min_list[0])):
+        aux = min_list[0][i]
+        if channel_list[aux] <= 35:
+            min_list_output.append(channel_list[aux])
+            min_time_list.append(time_list[aux])
+
+    return min_list_output, min_time_list
+
+
 def get_graphs(channel_list, channel, time_list):
     min_index, min_value = find_min_index(channel_list[0:164])
     if min_index <= 20:
@@ -74,7 +92,7 @@ def get_graphs(channel_list, channel, time_list):
         # find max and min
         min_index, min_value = find_min_index(chunks_list[i])
         max_index, max_value = find_max_index(chunks_list[i])
-        if float(60) >= float(min_value) >= -10:
+        if float(60) >= float(min_value) >= float(-10):
             min_list.append(min_value)
             max_list.append(max_value)
             min_times_list.append(times_list[i][min_index])
@@ -92,33 +110,6 @@ def get_graphs(channel_list, channel, time_list):
     # plt.show()
 
     return max_list, min_list, min_times_list
-
-
-# def statistics(max_list, min_list, channel):
-#     # MAX
-#     max_in_max_list = max(max_list)
-#     min_in_max_list = min(max_list)
-#     average_max = sum(max_list) / len(max_list)
-#
-#     # MIN
-#     max_in_min_list = max(min_list)
-#     min_in_min_list = min(min_list)
-#     average_min = sum(min_list) / len(min_list)
-#
-#     print('CHANNEL {}:'.format(channel))
-#     print('max: {}'.format(max_in_max_list))
-#     print('average max: {}'.format(average_max))
-#     print('min: {}'.format(min_in_min_list))
-#     print('average min: {}'.format(average_min))
-#
-
-# def plot_mins(min_list, times_list, channel, date):
-#     plt.figure()
-#     plt.plot(times_list, min_list, marker='.', markersize=10)
-#     plt.title('Min Values on Channel {} on {}'.format(channel, date))
-#     plt.xticks(rotation=45, fontsize=8)
-#     plt.ylim([-7, 7])
-#     plt.show()
 
 
 def database_temps(list):
@@ -149,60 +140,57 @@ def database_temps(list):
 
 
 def import_temperatures(file, filename):
+    # parse filename
     channels = filename.split('-')
     channels_parsed = []
     off_channels = []
+    # check for off channels
     for row in channels[0:4]:
         channels_parsed.append(row[2])
         if 'off' in row:
             off_channels.append(row[2])
-    print(channels_parsed)
+
+    # open TXT File
     data1, data2, data3, data4, data_date, data_time = openCSV(file)
-
-    print(data_date[0])
-
-    # Graphs to see the sync
-    max_1, min_1, times1 = get_graphs(data1, '1', data_time)
-    max_2, min_2, times2 = get_graphs(data2, '2', data_time)
-    max_3, min_3, times3 = get_graphs(data3, '3', data_time)
-    max_4, min_4, times4 = get_graphs(data4, '4', data_time)
-
-    # See Stats  and control Panel
-    # statistics(max_1, min_1, 1)
-    # statistics(max_2, min_2, 2)
-    # statistics(max_3, min_3, 3)
-    # statistics(max_4, min_4, 4)
-
-    # plot_mins(min_1, times1, 1, data_date[0])
-    # plot_mins(min_2, times2, 2, data_date[0])
-    # plot_mins(min_3, times3, 3, data_date[0])
-    # plot_mins(min_4, times4, 4, data_date[0])
 
     db_channel_1 = []
     db_channel_2 = []
     db_channel_3 = []
     db_channel_4 = []
-    import datetime
+
+    # format dates
     d = datetime.datetime.strptime(data_date[0], "%d/%m/%Y")
     s = d.strftime('%Y-%m-%d')
 
-    for i in range(len(min_1)):
-        db_channel_1.append([channels_parsed[0], min_1[i], s, times1[i]])
-
-    for i in range(len(min_2)):
-        db_channel_2.append([channels_parsed[1], min_2[i], s, times2[i]])
-
-    for i in range(len(min_3)):
-        db_channel_3.append([channels_parsed[2], min_3[i], s, times3[i]])
-
-    for i in range(len(min_4)):
-        db_channel_4.append([channels_parsed[3], min_4[i], s, times4[i]])
-
+    # Graphs to see the sync
     if channels_parsed[0] not in off_channels:
+        min_1, times1 = find_mins_in_graph(data1, '1', data_time)
+
+        for i in range(len(min_1)):
+            db_channel_1.append([channels_parsed[0], min_1[i], s, times1[i]])
+
         database_temps(db_channel_1)
+
     if channels_parsed[1] not in off_channels:
+        min_2, times2 = find_mins_in_graph(data2, '2', data_time)
+
+        for i in range(len(min_2)):
+            db_channel_2.append([channels_parsed[1], min_2[i], s, times2[i]])
+
         database_temps(db_channel_2)
+
     if channels_parsed[2] not in off_channels:
+        min_3, times3 = find_mins_in_graph(data3, '3', data_time)
+
+        for i in range(len(min_3)):
+            db_channel_3.append([channels_parsed[2], min_3[i], s, times3[i]])
+
         database_temps(db_channel_3)
+
     if channels_parsed[3] not in off_channels:
+        min_4, times4 = find_mins_in_graph(data4, '4', data_time)
+
+        for i in range(len(min_4)):
+            db_channel_4.append([channels_parsed[3], min_4[i], s, times4[i]])
+
         database_temps(db_channel_4)
