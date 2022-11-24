@@ -74,12 +74,13 @@ def get_graphs(channel_list, channel, time_list):
         # find max and min
         min_index, min_value = find_min_index(chunks_list[i])
         max_index, max_value = find_max_index(chunks_list[i])
-        if 60 < float(min_value) < -10:
-            continue
-        else:
+        if float(min_value) in range(-10, 60):
             min_list.append(min_value)
             max_list.append(max_value)
             min_times_list.append(times_list[i][min_index])
+
+        else:
+            continue
 
     #     # plots
     #
