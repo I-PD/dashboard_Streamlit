@@ -103,10 +103,10 @@ with tab2:
         st.write('You selected dates between', start_plot, 'and', end_plot)
         mask = (df_plot_h['date'] >= start_plot) & (df_plot_h['date'] <= end_plot)
         df_plot_h = df_plot_h.loc[mask]
-    row2_col1, row2_col2 = st.columns(2)
-    with row2_col1:
-        fig = px.scatter(df_plot_h, x=df_plot_h.index, y="humidity")
-        st.plotly_chart(fig, use_container_width=True)
-    with row2_col2:
-        fig = px.box(df_plot_h, y="humidity", x='date')
-        st.plotly_chart(fig, use_container_width=True)
+    # row2_col1, row2_col2 = st.columns(2)
+    # with row2_col1:
+    #     fig = px.scatter(df_plot_h, x=df_plot_h.index, y="humidity")
+    #     st.plotly_chart(fig, use_container_width=True)
+    # with row2_col2:
+    fig = px.box(df_plot_h, y="humidity", x='date')
+    st.plotly_chart(fig, use_container_width=True)
